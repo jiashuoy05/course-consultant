@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧創新大賞</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+            --hallucination: #ef4444;
+        }
+
+        [data-mode="no-rag"] {
+            --primary: #be123c;
+            --secondary: #7f1d1d;
+            --bg: #1a1213;
+            --card-bg: rgba(26, 18, 19, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', 'Noto+Sans+TC', sans-serif;
+            background: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding-top: 5vh;
+        }
+
+        .container { width: 90%; max-width: 900px; z-index: 1; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        /* Mode Tabs */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease;
+        }
+
+        .mode-tabs {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.35rem;
+            backdrop-filter: blur(10px);
+            gap: 0.25rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 0.5rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover { color: #e2e8f0; }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+
+        .search-wrapper {
+            position: relative;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 0.5rem;
+            display: flex;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .search-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 1rem 1.5rem;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        button.search-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 18px;
+            padding: 0 2.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button.search-btn:active { transform: scale(0.95); }
+
+        .loader { display: none; justify-content: center; margin-top: 3rem; }
+        .dot { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; margin: 0 4px; animation: bounce 1s infinite alternate; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .results-area { margin-top: 2.5rem; display: none; width: 100%; }
+        .result-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            padding: 2.5rem;
+            line-height: 1.8;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .answer { font-size: 1.1rem; color: #e2e8f0; }
+
+        /* Markdown styling */
+        .answer h1, .answer h2, .answer h3, .answer h4, .answer h5, .answer h6 {
+            margin: 1rem 0 0.5rem 0;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .answer h1 { font-size: 1.8rem; }
+        .answer h2 { font-size: 1.5rem; }
+        .answer h3 { font-size: 1.3rem; }
+        .answer h4 { font-size: 1.1rem; }
+        .answer h5 { font-size: 1rem; }
+        .answer h6 { font-size: 0.95rem; }
+
+        .answer code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #fca5a5;
+            font-size: 0.95em;
+        }
+
+        .answer pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0.8rem 0;
+            border-left: 3px solid var(--primary);
+            line-height: 1.5;
+        }
+
+        .answer pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+            font-size: 0.9rem;
+        }
+
+        .answer ul, .answer ol {
+            margin: 0.8rem 0 0.8rem 2rem;
+        }
+
+        .answer li {
+            margin: 0.4rem 0;
+        }
+
+        .answer a {
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.2s;
+        }
+
+        .answer a:hover {
+            border-bottom-color: var(--primary);
+            opacity: 0.8;
+        }
+
+        .answer blockquote {
+            border-left: 3px solid var(--primary);
+            padding-left: 1rem;
+            margin: 0.8rem 0;
+            color: #cbd5e1;
+            font-style: italic;
+        }
+
+        .answer p {
+            margin: 0.8rem 0;
+        }
+
+        .sources {
+            margin-top: 2rem; padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex; flex-wrap: wrap; gap: 0.6rem;
+        }
+        .source-tag {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            padding: 0.3rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes bounce { to { opacity: 0.3; transform: translateY(-10px); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Pipeline Panel */
+        .pipeline-panel {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        [data-mode="no-rag"] .pipeline-panel {
+            background: rgba(190, 18, 60, 0.05);
+            border-color: rgba(190, 18, 60, 0.2);
+        }
+        .pipeline-step { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.88rem; }
+        .step-icon {
+            width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .step-icon.running {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .step-icon.done { color: #22c55e; font-size: 1rem; line-height: 1; }
+        .step-label { font-weight: 600; color: #e2e8f0; line-height: 18px; }
+        .step-detail {
+            color: #94a3b8; font-size: 0.78rem; margin-top: 0.25rem;
+            display: flex; flex-wrap: wrap; gap: 0.3rem;
+        }
+        .query-pill {
+            background: rgba(99, 102, 241, 0.15); color: #a5b4fc;
+            padding: 0.1rem 0.55rem; border-radius: 5px; font-size: 0.75rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>智慧創新大賞</h1>
+        </header>
+
+        <div class="controls">
+            <div class="mode-tabs">
+                <button class="tab-btn" data-tab="no_rag" onclick="setMode('no_rag')">一般模式</button>
+                <button class="tab-btn active" data-tab="our_rag" onclick="setMode('our_rag')">我們的系統</button>
+            </div>
+        </div>
+
+        <div class="search-wrapper">
+            <input type="text" id="queryInput" placeholder="詢問 課程大綱、法規辦法或職涯建議..." onkeypress="if(event.key==='Enter')submitQuery()">
+            <button class="search-btn" onclick="submitQuery()">查詢</button>
+        </div>
+
+        <div class="loader" id="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+        <div class="results-area" id="resultsArea">
+            <div class="pipeline-panel" id="pipelinePanel" style="display:none;"></div>
+            <div class="result-card" id="resultCard" style="display:none;">
+                <div class="answer" id="answerArea"></div>
+                <div class="sources" id="sourcesArea"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+        let currentAbortController = null;
+        let currentMode = 'our_rag';
+
+        const MODE_DATA_ATTR = {
+            'no_rag': 'no-rag',
+            'our_rag': 'our-rag',
+        };
+
+        const MODE_STEPS = {
+            'no_rag': ['llm'],
+            'our_rag': ['expand', 'retrieve', 'rerank', 'llm'],
+        };
+
+        document.addEventListener('DOMContentLoaded', function () { setMode('our_rag'); });
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.documentElement.setAttribute('data-mode', MODE_DATA_ATTR[mode]);
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === mode);
+            });
+            if (mode === 'no_rag') conversationHistory = [];
+        }
+
+        const STEP_DEFS = {
+            expand: '重寫查詢', retrieve: '向量檢索', rerank: '重新排序', llm: 'LLM 思考中',
+        };
+
+        function initPipelinePanel(mode) {
+            const panel = document.getElementById('pipelinePanel');
+            panel.innerHTML = '';
+            const steps = MODE_STEPS[mode] || ['llm'];
+            steps.forEach(stepId => {
+                const el = document.createElement('div');
+                el.className = 'pipeline-step';
+                el.innerHTML = `
+                    <div class="step-icon" id="icon-${stepId}"></div>
+                    <div>
+                        <div class="step-label">${STEP_DEFS[stepId]}</div>
+                        <div class="step-detail" id="detail-${stepId}"></div>
+                    </div>`;
+                panel.appendChild(el);
+            });
+            panel.style.display = 'flex';
+            document.getElementById('resultCard').style.display = 'none';
+            document.getElementById('resultsArea').style.display = 'block';
+        }
+
+        function updatePipelineStep(event) {
+            const icon = document.getElementById('icon-' + event.step);
+            const detail = document.getElementById('detail-' + event.step);
+            if (!icon) return;
+            if (event.status === 'running') {
+                icon.className = 'step-icon running';
+            } else if (event.status === 'done') {
+                icon.className = 'step-icon done';
+                icon.textContent = '✓';
+                if (event.step === 'expand' && event.data?.variants) {
+                    detail.innerHTML = event.data.variants.slice(1).map(v => `<span class="query-pill">${v}</span>`).join('');
+                } else if (event.step === 'retrieve' && event.data) {
+                    detail.textContent = `${event.data.doc_count} 個文件片段`;
+                } else if (event.step === 'rerank' && event.data) {
+                    detail.textContent = `篩選至前 ${event.data.top_k} 個`;
+                }
+            }
+        }
+
+        async function submitQuery() {
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) return;
+
+            if (currentAbortController) currentAbortController.abort();
+            currentAbortController = new AbortController();
+
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('resultsArea').style.display = 'none';
+
+            try {
+                const response = await fetch('/query/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: query, mode: currentMode, history: conversationHistory }),
+                    signal: currentAbortController.signal
+                });
+
+                document.getElementById('loader').style.display = 'none';
+                initPipelinePanel(currentMode);
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const messages = buffer.split('\n\n');
+                    buffer = messages.pop();
+                    for (const msg of messages) {
+                        const trimmed = msg.trim();
+                        if (!trimmed.startsWith('data: ')) continue;
+                        let event;
+                        try { event = JSON.parse(trimmed.slice(6)); } catch { continue; }
+                        if (event.type === 'result') {
+                            if (currentMode !== 'no_rag') {
+                                conversationHistory.push({ role: 'user', content: query });
+                                conversationHistory.push({ role: 'assistant', content: event.answer });
+                            }
+                            displayResult(event);
+                        } else if (event.type === 'error') {
+                            alert('Error: ' + event.error);
+                        } else if (event.step) {
+                            updatePipelineStep(event);
+                        }
+                    }
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') alert('連線失敗');
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        function displayResult(data) {
+            const answerArea = document.getElementById('answerArea');
+            const sourcesArea = document.getElementById('sourcesArea');
+            answerArea.innerHTML = DOMPurify.sanitize(marked.parse(data.answer));
+            sourcesArea.innerHTML = '';
+            if (data.sources) {
+                data.sources.forEach(source => {
+                    const tag = document.createElement('span');
+                    tag.className = 'source-tag';
+                    tag.innerText = source;
+                    sourcesArea.appendChild(tag);
+                });
+            }
+            document.getElementById('resultCard').style.display = 'block';
+            updatePipelineStep({ step: 'llm', status: 'done' });
+        }
+    </script>
+</body>
+</html>

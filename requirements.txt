@@ -1,0 +1,11 @@
+flask
+langchain
+langchain-google-genai
+langchain-community
+langchain-ollama
+langchain-text-splitters
+faiss-cpu
+python-dotenv
+sentence-transformers
+torch
+transformers
