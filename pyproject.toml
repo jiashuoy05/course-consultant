@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
+entrypoint = "rag_demo_app:app"
 dependencies = [
     "faiss-cpu>=1.8.0",
     "flask>=3.0.0",
