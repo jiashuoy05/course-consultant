@@ -19,4 +19,4 @@ dependencies = [
 ]
 
 [tool.vercel]
-entrypoint = "rag_demo_app:app"
+entrypoint = "server/webhook_server:app"
