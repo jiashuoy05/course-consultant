@@ -3,15 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>114 電子實務專題</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>114 電子系實務專題</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
     <style>
+        @font-face {
+            font-family: "Noto Sans TC Local";
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: block;
+            src:
+                url("/static/fonts/NotoSansTC-Variable.ttf") format("truetype"),
+                url("../static/fonts/NotoSansTC-Variable.ttf") format("truetype");
+        }
+
         :root {
             --primary: #111111;
             --secondary: #6b7280;
-            --bg: #f7f7f5;
+            --bg: #f6f6f4;
             --card-bg: #ffffff;
             --text: #111111;
             --muted: #6b7280;
@@ -20,9 +30,9 @@
         }
 
         [data-mode="no-rag"] {
+            --bg: #f6f6f4;
             --primary: #111111;
             --secondary: #6b7280;
-            --bg: #f2f2f0;
             --card-bg: #ffffff;
             --text: #111111;
             --muted: #6b7280;
@@ -32,7 +42,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Outfit', 'Noto+Sans+TC', sans-serif;
+            font-family: "Noto Sans TC Local", "PingFang TC", "Microsoft JhengHei", "Source Han Sans TC", "Heiti TC", "Segoe UI", Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -312,7 +322,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>114 電子實務專題</h1>
+            <h1>114 電子系實務專題</h1>
         </header>
 
         <div class="controls">

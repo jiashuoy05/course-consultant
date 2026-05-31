@@ -12,7 +12,7 @@ from rag_engine_ollama import PureRAGOllamaEmbeddingEngine
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 engine = None
 
 
