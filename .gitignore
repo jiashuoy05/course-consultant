@@ -1,6 +1,5 @@
-.env
 **/__pycache__/
-data/faiss_index/
-*.pkl
-*.faiss
-data/
+apps
+.vercel
+.env*
+.venv

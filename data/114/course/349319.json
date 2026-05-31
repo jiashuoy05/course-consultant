@@ -1,0 +1,16 @@
+[
+  {
+    "name": "曾恕銘",
+    "email": "shuming@ntut.edu.tw",
+    "latestUpdate": "2025-08-26 21:43:05",
+    "objective": "I) 數位通訊系統 / 通訊理論\nII) 行動 / 無線傳輸技術：基礎和最新發展如 B5G/6G D2D、SCMA 、NOMA、RIS\nIII) 無線視訊傳輸",
+    "schedule": "Part I Digital Communication Systems\n█Background Review (linear algebra, probability)\n█Digital communications\nPart II Mobile/Wireless Transmissition Technology Fundamentals and Recent Advances\n█Mobile communication fundamentals\n█CDMA/SCMA for B5G/6G (new)\n█Data detection/interference cancellation\n█MIMO(Spatial Multiplexing/MU-MIMO/STBC/distributed STBC/beamforming) \n█OFDM(A) (principle/synchronization/channel estimation/power allocation)\n█5G  key tech application scenerios and B5G/6G  NOMA(Non-Orthogonal Mulptiple Access)、SCMA(Sparse Code Mulptiple Access)、FD(full duplex) 、RIS(Reconfigurable Intelligent Surface)  (new)\nPart III Wireless Video Communications\n█  Information theory &  video source coding \n█  Error Resilience  video cross-layer  optimization problem foumulation and solution (AMC MDC HARQ)",
+    "scorePolicy": "Oral report 1: 20%\nExam: 30% \nOral report 2: 50%",
+    "materials": "使用自編教材 / Use of self-made materials",
+    "consultation": "Office hours",
+    "課程對應SDGs指標": "無（None）",
+    "課程是否導入AI": "● 無（None）",
+    "remarks": "",
+    "foreignLanguageTextbooks": false
+  }
+]
